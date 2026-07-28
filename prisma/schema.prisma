@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id          Int              @id @default(autoincrement())
+  title       String
+  description String?
+  basePrice   Decimal          @db.Decimal(10, 2)
+  options     ProductOption[]
+  variants    ProductVariant[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model ProductOption {
+  id        Int                 @id @default(autoincrement())
+  productId Int
+  name      String
+  product   Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  values    ProductOptionValue[]
+
+  @@unique([productId, name])
+}
+
+model ProductOptionValue {
+  id         Int           @id @default(autoincrement())
+  optionId   Int
+  value      String
+  extraPrice Decimal       @default(0) @db.Decimal(10, 2)
+  option     ProductOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([optionId, value])
+}
+
+model ProductVariant {
+  id                Int     @id @default(autoincrement())
+  productId         Int
+  sku               String  @unique
+  price             Decimal @db.Decimal(10, 2)
+  stock             Int     @default(0)
+  optionCombination Json
+  product           Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
