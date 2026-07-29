@@ -1,5 +1,12 @@
 import { prisma } from "@/src/lib/prisma";
 import { success, error } from "@/src/lib/api-response";
+import { NextResponse } from "next/server";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
 
 export async function GET(
   _request: Request,
@@ -10,7 +17,7 @@ export async function GET(
     const productId = parseInt(id, 10);
 
     if (isNaN(productId)) {
-      return error("Invalid product ID", 400);
+      return error("Invalid product ID", 400, corsHeaders);
     }
 
     const variants = await prisma.productVariant.findMany({
@@ -25,12 +32,19 @@ export async function GET(
     });
 
     if (!variants.length) {
-      return error("No variants found for this product", 404);
+      return error("No variants found for this product", 404, corsHeaders);
     }
 
-    return success(variants);
+    return success(variants, 200, corsHeaders);
   } catch (e) {
     console.error(e);
-    return error("Internal server error", 500);
+    return error("Internal server error", 500, corsHeaders);
   }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
 }
