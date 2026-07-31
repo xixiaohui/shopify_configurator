@@ -89,6 +89,7 @@ export async function POST(request: Request) {
       price: totalPrice,
       sku: matchedVariant.sku,
       stock: matchedVariant.stock,
+      recommendations: matchedVariant.recommendations,
     }, 200, corsHeaders);
   } catch (e) {
     console.error(e);
