@@ -28,6 +28,7 @@ export async function GET(
         price: true,
         stock: true,
         optionCombination: true,
+        recommendations: true,
       },
     });
 

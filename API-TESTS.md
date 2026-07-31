@@ -49,6 +49,7 @@ curl -s http://localhost:3000/api/products/1/variants | jq
 ```
 
 期望返回 4 个 variant（Black+M、Black+L、White+M、White+L）。
+其中 `SKU-BLK-M` 的 `recommendations` 字段包含示例推荐数据，其余 variant 的 `recommendations` 为 `null`。
 
 ---
 
@@ -70,7 +71,11 @@ curl -s -X POST http://localhost:3000/api/configurator/price \
   "data": {
     "price": 199,
     "sku": "SKU-BLK-M",
-    "stock": 50
+    "stock": 50,
+    "recommendations": [
+      { "sku": "SKU-WHT-M", "reason": "Alternative color" },
+      { "sku": "SKU-BLK-L", "reason": "Larger size" }
+    ]
   }
 }
 ```
@@ -91,7 +96,8 @@ curl -s -X POST http://localhost:3000/api/configurator/price \
   "data": {
     "price": 229,
     "sku": "SKU-WHT-L",
-    "stock": 50
+    "stock": 50,
+    "recommendations": null
   }
 }
 ```
@@ -112,7 +118,8 @@ curl -s -X POST http://localhost:3000/api/configurator/price \
   "data": {
     "price": 219,
     "sku": "SKU-BLK-L",
-    "stock": 50
+    "stock": 50,
+    "recommendations": null
   }
 }
 ```
@@ -133,7 +140,8 @@ curl -s -X POST http://localhost:3000/api/configurator/price \
   "data": {
     "price": 209,
     "sku": "SKU-WHT-M",
-    "stock": 50
+    "stock": 50,
+    "recommendations": null
   }
 }
 ```

@@ -83,14 +83,24 @@ async function main() {
   ];
 
   for (const v of variants) {
+    const data: Record<string, unknown> = {
+      productId: product.id,
+      sku: v.sku,
+      price: v.price,
+      stock: 50,
+      optionCombination: v.combination,
+    };
+
+    // Add sample recommendations for SKU-BLK-M
+    if (v.sku === "SKU-BLK-M") {
+      data.recommendations = [
+        { sku: "SKU-WHT-M", reason: "Alternative color" },
+        { sku: "SKU-BLK-L", reason: "Larger size" },
+      ];
+    }
+
     await prisma.productVariant.create({
-      data: {
-        productId: product.id,
-        sku: v.sku,
-        price: v.price,
-        stock: 50,
-        optionCombination: v.combination,
-      },
+      data: data as Parameters<typeof prisma.productVariant.create>[0]["data"],
     });
     console.log(`Created variant: ${v.sku}`);
   }
