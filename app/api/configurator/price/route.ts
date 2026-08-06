@@ -1,13 +1,6 @@
 import { prisma } from "@/src/lib/prisma";
 import { success, error } from "@/src/lib/api-response";
 import { priceRequestSchema } from "@/src/lib/validations";
-import { NextResponse } from "next/server";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
 
 export async function POST(request: Request) {
   try {
@@ -15,7 +8,7 @@ export async function POST(request: Request) {
     const parsed = priceRequestSchema.safeParse(body);
 
     if (!parsed.success) {
-      return error("Invalid request body", 400, corsHeaders);
+      return error("Invalid request body", 400);
     }
 
     const { productId, options } = parsed.data;
@@ -33,7 +26,7 @@ export async function POST(request: Request) {
     });
 
     if (!product) {
-      return error("Product not found", 404, corsHeaders);
+      return error("Product not found", 404);
     }
 
     // Calculate base price
@@ -43,15 +36,14 @@ export async function POST(request: Request) {
     for (const [optionName, optionValue] of Object.entries(options)) {
       const option = product.options.find((o) => o.name === optionName);
       if (!option) {
-        return error(`Option "${optionName}" not found for this product`, 400, corsHeaders);
+        return error(`Option "${optionName}" not found for this product`, 400);
       }
 
       const value = option.values.find((v) => v.value === optionValue);
       if (!value) {
         return error(
           `Value "${optionValue}" not found for option "${optionName}"`,
-          400,
-          corsHeaders
+          400
         );
       }
 
@@ -64,7 +56,7 @@ export async function POST(request: Request) {
     });
 
     if (!variant) {
-      return error("No variants found for this product", 404, corsHeaders);
+      return error("No variants found for this product", 404);
     }
 
     // Try to find an exact variant match
@@ -90,16 +82,9 @@ export async function POST(request: Request) {
       sku: matchedVariant.sku,
       stock: matchedVariant.stock,
       recommendations: matchedVariant.recommendations,
-    }, 200, corsHeaders);
+    }, 200);
   } catch (e) {
     console.error(e);
-    return error("Internal server error", 500, corsHeaders);
+    return error("Internal server error", 500);
   }
-}
-
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 204,
-    headers: corsHeaders,
-  });
 }
